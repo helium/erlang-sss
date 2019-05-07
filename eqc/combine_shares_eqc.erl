@@ -26,4 +26,4 @@ gen_n_k() ->
               ?LET({X, Y},
                    ?SUCHTHAT({A, B}, {int(), int()}, A > 0 andalso B >= 0 andalso A > B),
                    {X*3, X - Y}),
-              N > 3*K+1 andalso K > 1).
+              N > 3*K andalso N < 256 andalso K > 1).
