@@ -65,9 +65,9 @@ not_enough_shares_test(Config) ->
     N = 100,
     K = 100,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
-    %% This should blow up
+    %% This should not recombine
     Restored = erlang_sss:sss_combine_keyshares(Shares, K-1),
-    ?assertEqual(Restored, {error, not_enough_shares}).
+    ?assertNotEqual(Restored, Data).
 
 too_many_secrets_test(Config) ->
     %% too many secret shares should also restore the secret
