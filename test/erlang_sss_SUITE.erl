@@ -39,7 +39,7 @@ normal_test(Config) ->
     K = 1,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
     Restored = erlang_sss:sss_combine_keyshares(Shares, K),
-    Data = Restored.
+    ?assertEqual(Restored, Data).
 
 threshold_test(Config) ->
     %% a basic threshold test
@@ -48,7 +48,7 @@ threshold_test(Config) ->
     K = 4,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
     Restored = erlang_sss:sss_combine_keyshares(Shares, K),
-    Data = Restored.
+    ?assertEqual(Restored, Data).
 
 many_shares_test(Config) ->
     %% a lot of shares should also work
@@ -57,7 +57,7 @@ many_shares_test(Config) ->
     K = 255,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
     Restored = erlang_sss:sss_combine_keyshares(Shares, K),
-    Data = Restored.
+    ?assertEqual(Restored, Data).
 
 not_enough_shares_test(Config) ->
     %% not enough shares to restore secret
@@ -67,7 +67,7 @@ not_enough_shares_test(Config) ->
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
     %% This should blow up
     Restored = erlang_sss:sss_combine_keyshares(Shares, K-1),
-    Data = Restored.
+    ?assertEqual(Restored, {error, not_enough_shares}).
 
 too_many_secrets_test(Config) ->
     %% too many secret shares should also restore the secret
@@ -76,4 +76,4 @@ too_many_secrets_test(Config) ->
     K = 100,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
     Restored = erlang_sss:sss_combine_keyshares(Shares, K+K),
-    Data = Restored.
+    ?assertEqual(Restored, Data).
