@@ -16,6 +16,7 @@
 
 #include "erl_nif.h"
 #include "hazmat.h"
+#include <string.h>
 
 static ERL_NIF_TERM
 erl_sss_create_keyshares(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
@@ -40,10 +41,22 @@ erl_sss_create_keyshares(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
     }
 
     // allocate n ErlNifBinaries to hold the shares
+    ERL_NIF_TERM share_list = enif_make_list(env, 0);
+    unsigned char keyshares[n][sss_KEYSHARE_LEN];
 
     // split the key into the N shares
+    sss_create_keyshares(keyshares, key.data, n, k);
+
+
+    for(int i=0; i < n; i++) {
+        ERL_NIF_TERM share_bin = {0};
+        unsigned char * share_data = enif_make_new_binary(env, sss_KEYSHARE_LEN, &share_bin);
+        memcpy(share_data, keyshares[i], sss_KEYSHARE_LEN);
+        share_list = enif_make_list_cell(env, share_bin, share_list);
+    }
 
     // return the list of binaries
+    return share_list;
 }
 
 static ERL_NIF_TERM
