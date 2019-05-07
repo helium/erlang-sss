@@ -27,7 +27,7 @@ all() ->
 
 init_per_testcase(_, Config) ->
     Data = crypto:strong_rand_bytes(32),
-    [{datat, Data} | Config].
+    [{data, Data} | Config].
 
 end_per_testcase(_, _Config) ->
     ok.
