@@ -78,5 +78,5 @@ load(ErlNifEnv * env, void ** priv_data, ERL_NIF_TERM load_info)
     return 0;
 }
 
-ERL_NIF_INIT(sss, nif_funcs, load, NULL, NULL, NULL);
+ERL_NIF_INIT(erlang_sss, nif_funcs, load, NULL, NULL, NULL);
 
