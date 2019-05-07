@@ -8,17 +8,18 @@
 
 -on_load(init/0).
 
--type shares() :: [binary()].
+-type shares() :: [<<_:264>>, ...].
+-type key() :: <<_:256>>.
 
 %%====================================================================
 %% API functions
 %%====================================================================
 
--spec sss_create_keyshares(Data :: binary(), N :: non_neg_integer(), K :: non_neg_integer()) -> shares().
+-spec sss_create_keyshares(Data :: key(), N :: pos_integer(), K :: pos_integer()) -> shares().
 sss_create_keyshares(_Data, _N, _K) ->
     not_loaded(?LINE).
 
--spec sss_combine_keyshares(Shares :: shares(), K :: non_neg_integer()) -> binary().
+-spec sss_combine_keyshares(Shares :: shares(), K :: pos_integer()) -> key().
 sss_combine_keyshares(_Shares, _K) ->
     not_loaded(?LINE).
 

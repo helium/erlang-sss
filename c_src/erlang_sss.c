@@ -40,14 +40,14 @@ erl_sss_create_keyshares(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
         return enif_make_badarg(env);
     }
 
-    // allocate n ErlNifBinaries to hold the shares
-    ERL_NIF_TERM share_list = enif_make_list(env, 0);
+    // create n buffers for keyshares
     unsigned char keyshares[n][sss_KEYSHARE_LEN];
 
     // split the key into the N shares
     sss_create_keyshares(keyshares, key.data, n, k);
 
-
+    // allocate n ErlNifBinaries to hold the shares
+    ERL_NIF_TERM share_list = enif_make_list(env, 0);
     for(int i=0; i < n; i++) {
         ERL_NIF_TERM share_bin = {0};
         unsigned char * share_data = enif_make_new_binary(env, sss_KEYSHARE_LEN, &share_bin);
@@ -62,14 +62,35 @@ erl_sss_create_keyshares(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 erl_sss_combine_keyshares(ErlNifEnv * env, int argc, const ERL_NIF_TERM argv[])
 {
+    int k = 0;
+    unsigned int n = 0;
     // check that argv[0] is a list of 33 byte binaries
-    // check K (argv[1]) is reasonable (same length as list of binaries) XXX maybe K is just the length of the list??
+    if (argc != 2 || !enif_get_int(env, argv[1], &k) || k < 1 || !enif_get_list_length(env, argv[0], &n) || n < 1 || n < (unsigned int)k) {
+        return enif_make_badarg(env);
+    }
+
+    unsigned char keyshares[n][sss_KEYSHARE_LEN];
+    ERL_NIF_TERM head, tail = argv[0];
+    int i = 0;
+    while (enif_get_list_cell(env, tail, &head, &tail)) {
+        ErlNifBinary share;
+        if (!enif_inspect_binary(env, head, &share) || share.size != sss_KEYSHARE_LEN) {
+            return enif_make_badarg(env);
+        } else {
+            memcpy(keyshares[i], share.data, sss_KEYSHARE_LEN);
+            i++;
+        }
+    }
 
     // allocate a 32 byte binary to hold the key
+    ERL_NIF_TERM key = {0};
+    unsigned char* key_data = enif_make_new_binary(env, 32, &key);
 
     // combine the shares
+    sss_combine_keyshares(key_data, keyshares, k);
 
     // return the reassembled key
+    return key;
 }
 
 
@@ -87,6 +108,7 @@ load(ErlNifEnv * env, void ** priv_data, ERL_NIF_TERM load_info)
 {
     (void)priv_data;
     (void)load_info;
+    (void)env;
 
     return 0;
 }

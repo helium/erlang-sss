@@ -35,10 +35,10 @@ end_per_testcase(_, _Config) ->
 normal_test(Config) ->
     %% simple unit test
     Data = proplists:get_value(data, Config),
-    N = 1,
-    K = 1,
+    N = 3,
+    K = 2,
     Shares = erlang_sss:sss_create_keyshares(Data, N, K),
-    Restored = erlang_sss:sss_combine_keyshares(Shares, K),
+    Restored = erlang_sss:sss_combine_keyshares(tl(Shares), K),
     ?assertEqual(Restored, Data).
 
 threshold_test(Config) ->
